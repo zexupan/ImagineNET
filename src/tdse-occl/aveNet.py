@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 import copy
-from global_v_encoder import vEncoder_global
 
 EPS = 1e-8
 

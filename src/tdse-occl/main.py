@@ -2,7 +2,7 @@ import argparse
 import torch
 from utils import *
 import os
-from aveNet import aveNet
+from imagineNet import imagineNet
 from solver import Solver
 import apex
 
@@ -15,7 +15,7 @@ def main(args):
 
 
     # Model
-    model = aveNet(args.N, args.L, args.B, args.H, args.P, args.X, args.R,
+    model = imagineNet(args.N, args.L, args.B, args.H, args.P, args.X, args.R,
                         args.C, args.V)
 
     if (args.distributed and args.local_rank ==0) or args.distributed == False:

@@ -9,9 +9,9 @@ EPS = 1e-8
 def _clones(module, N):
     return nn.ModuleList([copy.deepcopy(module) for i in range(N)])
 
-class aveNet(nn.Module):
+class imagineNet(nn.Module):
     def __init__(self, N, L, B, H, P, X, R, C, V):
-        super(aveNet, self).__init__()
+        super(imagineNet, self).__init__()
 
         # audio encoder and bottleneck layer
         self.a_encoder = audioEncoder(L, N)

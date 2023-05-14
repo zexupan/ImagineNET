@@ -54,6 +54,7 @@ class dataset(data.Dataset):
         mixtures=[]
         audios=[]
         visuals=[]
+        visuals_gt=[]
         for line in batch_lst:
             mixture_path=self.mixture_direc+self.partition+'/'+ line.replace(',','_').replace('/','_')+'.wav'
             _, mixture = wavfile.read(mixture_path)
@@ -76,12 +77,24 @@ class dataset(data.Dataset):
                     visual = np.pad(visual, ((0,int(length - visual.shape[0])),(0,0)), mode = 'edge')
                 visuals.append(visual)
 
+                # read un_occluded target visual reference
+                visual_path_gt=self.visual_direc+line[c*4+1]+'/'+line[c*4+2]+'/'+line[c*4+3]+'.npy'
+                visual_gt = np.load(visual_path_gt.replace('sync/sync_v_occl','sync/sync_v'))
+                length = math.floor(min_length/self.sampling_rate*25)
+                visual_gt = visual_gt[:length,...]
+                a = visual_gt.shape[0]
+                if visual_gt.shape[0] < length:
+                    visual_gt = np.pad(visual_gt, ((0,int(length - visual_gt.shape[0])),(0,0)), mode = 'edge')
+                visuals_gt.append(visual_gt)
+
+
                 # read overlapped speech
                 mixtures.append(mixture)
         
         return np.asarray(mixtures)[...,:self.max_length*self.sampling_rate], \
                 np.asarray(audios)[...,:self.max_length*self.sampling_rate], \
-                np.asarray(visuals)[...,:self.max_length*25,:]
+                np.asarray(visuals)[...,:self.max_length*25,:], \
+                np.asarray(visuals_gt)[...,:self.max_length*25,:]
 
     def __len__(self):
         return len(self.minibatch)

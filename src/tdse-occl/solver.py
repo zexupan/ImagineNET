@@ -145,20 +145,21 @@ class Solver(object):
         total_v_loss = 0
         self.accu_count = 0
         self.optimizer.zero_grad()
-        for i, (a_mix, a_tgt, v_tgt) in enumerate(data_loader):
+        for i, (a_mix, a_tgt, v_tgt, v_tgt_gt) in enumerate(data_loader):
             a_mix = a_mix.cuda().squeeze(0).float()
             a_tgt = a_tgt.cuda().squeeze(0).float()
             v_tgt = v_tgt.cuda().squeeze(0).float()
+            v_tgt_gt = v_tgt_gt.cuda().squeeze(0).float()
 
             est_a_tgt, v_reconstruct = self.model(a_mix, v_tgt)
             max_snr = cal_SISNR(a_tgt, est_a_tgt)
 
             v_loss = 0
-            v_tgt = v_tgt.transpose(1,2)
+            v_tgt_gt = v_tgt_gt.transpose(1,2)
             for k in range(len(v_reconstruct)):
                 v_out = v_reconstruct[k]
-                v_out = F.pad(v_out,(0,v_tgt.size(2)-v_out.size(2)))
-                v_loss += self.v_loss(v_out, v_tgt)
+                v_out = F.pad(v_out,(0,v_tgt_gt.size(2)-v_out.size(2)))
+                v_loss += self.v_loss(v_out, v_tgt_gt)
 
             if state =='train':
                 loss = 0 - torch.mean(max_snr) + self.args.gamma*v_loss
